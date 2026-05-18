@@ -15,7 +15,7 @@ app.use(cors());
 app.get('/', (req, res) => {
   res.send('Samaaj Server is running');
 });
-app.use('./api/inngest', serve({ client: inngest, functions }));
+app.use('/api/inngest', serve({ client: inngest, functions }));
 
 const PORT = process.env.PORT || 4000;
 
