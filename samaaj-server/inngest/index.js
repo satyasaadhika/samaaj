@@ -9,7 +9,7 @@ export const inngest = new Inngest({ id: "samaaj-app" });
 const syncUserCreation = inngest.createFunction(
   {
     id: "sync-user-from-clerk",
-    trigger: { event: "clerk/user.created" },
+    triggers: [{ event: "clerk/user.created" }],
   },
 
   async ({ event }) => {
@@ -21,20 +21,22 @@ const syncUserCreation = inngest.createFunction(
       image_url,
     } = event.data;
 
-    let username = email_addresses[0].email_address.split("@")[0];
+    let username =
+      email_addresses[0].email_address.split("@")[0];
 
     // Check if username already exists
-    const existingUser = await User.findOne({ username });
+    const user = await User.findOne({ username });
 
     // Add random number if username exists
-    if (existingUser) {
-      username = username + Math.floor(Math.random() * 1000);
+    if (user) {
+      username =
+        username + Math.floor(Math.random() * 10000);
     }
 
     const userData = {
       _id: id,
       email: email_addresses[0].email_address,
-      full_name: `${first_name || ""} ${last_name || ""}`.trim(),
+      full_name: `${first_name} ${last_name}`,
       profile_picture: image_url,
       username,
     };
@@ -45,10 +47,10 @@ const syncUserCreation = inngest.createFunction(
 
 
 // Sync user update from Clerk
-const syncUserUpdate = inngest.createFunction(
+const syncUserUpdation = inngest.createFunction(
   {
     id: "update-user-from-clerk",
-    trigger: { event: "clerk/user.updated" },
+    triggers: [{ event: "clerk/user.updated" }],
   },
 
   async ({ event }) => {
@@ -62,7 +64,7 @@ const syncUserUpdate = inngest.createFunction(
 
     const updateUserData = {
       email: email_addresses[0].email_address,
-      full_name: `${first_name || ""} ${last_name || ""}`.trim(),
+      full_name: `${first_name} ${last_name}`,
       profile_picture: image_url,
     };
 
@@ -75,7 +77,7 @@ const syncUserUpdate = inngest.createFunction(
 const syncUserDeletion = inngest.createFunction(
   {
     id: "delete-user-with-clerk",
-    trigger: { event: "clerk/user.deleted" },
+    triggers: [{ event: "clerk/user.deleted" }],
   },
 
   async ({ event }) => {
@@ -89,6 +91,6 @@ const syncUserDeletion = inngest.createFunction(
 // Export all functions
 export const functions = [
   syncUserCreation,
-  syncUserUpdate,
+  syncUserUpdation,
   syncUserDeletion,
 ];
